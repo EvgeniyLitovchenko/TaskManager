@@ -76,17 +76,36 @@ namespace TaskManager
             tb_command.Clear();
             tb_command.Focus();
         }
+        private bool TryGetSelectedProcess(out Process process)
+        {
+            process = null;
 
+            if (dataGridView.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Оберіть процес.");
+                return false;
+            }
+
+            try
+            {
+                int processId = (int)dataGridView.SelectedRows[0].Cells["ColumnId"].Value;
+                process = Process.GetProcessById(processId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Помилка доступу до процесу: {ex.Message}");
+                return false;
+            }
+        }
         private void btn_delete_Click(object sender, EventArgs e)
         {
-            if (dataGridView.SelectedRows.Count > 0)
+            if (TryGetSelectedProcess(out Process process))
             {
                 try
                 {
-                    int processId = (int)dataGridView.SelectedRows[0].Cells["ColumnId"].Value;
-                    Process process = Process.GetProcessById(processId);
-                    MessageBox.Show($"Процес {process.ProcessName} було зупинено.");
                     process.Kill();
+                    MessageBox.Show($"Процес {process.ProcessName} було зупинено.");
                     LoadProcesses();
                 }
                 catch (Exception ex)
@@ -94,32 +113,14 @@ namespace TaskManager
                     MessageBox.Show($"Помилка зупинки процесу: {ex.Message}");
                 }
             }
-            else
-            {
-                MessageBox.Show("Оберіть процес для зупинки.");
-            }
         }
 
         private void btn_change_Click(object sender, EventArgs e)
         {
-            if (dataGridView.SelectedRows.Count > 0)
+            if (TryGetSelectedProcess(out Process process))
             {
-                try
-                {
-                    int processId = (int)dataGridView.SelectedRows[0].Cells["ColumnId"].Value;
-                    Process process = Process.GetProcessById(processId);
-
-                    panelPriority.Visible = true;
-                    panelPriority.Tag = process;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Помилка доступу до процесу: {ex.Message}");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Оберіть процес для зміни пріоритету.");
+                panelPriority.Visible = true;
+                panelPriority.Tag = process;
             }
         }
 
@@ -158,7 +159,6 @@ namespace TaskManager
 
                     process.PriorityClass = newPriority;
                     MessageBox.Show($"Пріоритет процесу {process.ProcessName} змінено на {selectedPriority}.");
-
                     LoadProcesses();
                     panelPriority.Visible = false;
                 }
