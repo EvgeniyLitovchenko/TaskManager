@@ -8,19 +8,17 @@ namespace TaskManager
 {
     public partial class Form1 : Form
     {
-
         public Form1()
         {
             InitializeComponent();
 
-            cb_change.Items.AddRange(new string[]
-            {
-            "Idle",
-            "BelowNormal",
-            "Normal",
-            "AboveNormal",
-            "High",
-            "RealTime"
+            cb_change.Items.AddRange(new string[] {
+                "Idle",
+                "BelowNormal",
+                "Normal",
+                "AboveNormal",
+                "High",
+                "RealTime"
             });
             cb_change.SelectedIndex = 2;
             LoadProcesses();
@@ -78,14 +76,23 @@ namespace TaskManager
             RestoreSelection(selectedRowIndex, currentScrollPosition);
         }
 
+        private void SetCommandPanelVisibility(bool isVisible)
+        {
+            panelComand.Visible = isVisible;
+        }
 
+        private void SetPriorityPanelVisibility(bool isVisible)
+        {
+            panelPriority.Visible = isVisible;
+        }
 
         private void btn_Start_Click(object sender, EventArgs e)
         {
-            panelComand.Visible = true;
+            SetCommandPanelVisibility(true);
             tb_command.Clear();
             tb_command.Focus();
         }
+
         private bool TryGetSelectedProcess(out Process process)
         {
             process = null;
@@ -108,6 +115,7 @@ namespace TaskManager
                 return false;
             }
         }
+
         private void btn_delete_Click(object sender, EventArgs e)
         {
             if (TryGetSelectedProcess(out Process process))
@@ -129,7 +137,7 @@ namespace TaskManager
         {
             if (TryGetSelectedProcess(out Process process))
             {
-                panelPriority.Visible = true;
+                SetPriorityPanelVisibility(true);
                 panelPriority.Tag = process;
             }
         }
@@ -170,7 +178,7 @@ namespace TaskManager
                     process.PriorityClass = newPriority;
                     MessageBox.Show($"Пріоритет процесу {process.ProcessName} змінено на {selectedPriority}.");
                     LoadProcesses();
-                    panelPriority.Visible = false;
+                    SetPriorityPanelVisibility(false);
                 }
                 catch (Exception ex)
                 {
@@ -187,7 +195,7 @@ namespace TaskManager
                 if (process != null)
                 {
                     LoadProcesses();
-                    panelComand.Visible = false;
+                    SetCommandPanelVisibility(false);
                     MessageBox.Show($"Процес {process.ProcessName} запущено");
                 }
             }
@@ -197,15 +205,14 @@ namespace TaskManager
             }
         }
 
-
         private void btn_exitC_Click(object sender, EventArgs e)
         {
-            panelComand.Visible = false;
+            SetCommandPanelVisibility(false);
         }
 
         private void btn_exitP_Click(object sender, EventArgs e)
         {
-            panelPriority.Visible = false;
+            SetPriorityPanelVisibility(false);
             cb_change.SelectedIndex = 2;
         }
     }
