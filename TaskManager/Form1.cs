@@ -26,17 +26,14 @@ namespace TaskManager
             LoadProcesses();
         }
 
-        private void LoadProcesses()
+        private List<Process> GetProcessesList()
         {
-            int selectedRowIndex = -1;
-            if (dataGridView.SelectedRows.Count > 0)
-            {
-                selectedRowIndex = dataGridView.SelectedRows[0].Index;
-            }
+            return Process.GetProcesses().ToList();
+        }
 
-            int currentScrollPosition = dataGridView.FirstDisplayedScrollingRowIndex;
-
-            var processes = Process.GetProcesses();
+        private void UpdateProcessList()
+        {
+            var processes = GetProcessesList();
             dataGridView.Rows.Clear();
 
             foreach (var proc in processes)
@@ -52,22 +49,35 @@ namespace TaskManager
                         proc.StartTime
                     );
                 }
-                catch (Exception ex)
+                catch
                 {
                     continue;
                 }
             }
+        }
 
+        private void RestoreSelection(int selectedRowIndex, int scrollPosition)
+        {
             if (selectedRowIndex >= 0 && selectedRowIndex < dataGridView.Rows.Count)
             {
                 dataGridView.Rows[selectedRowIndex].Selected = true;
             }
 
-            if (currentScrollPosition >= 0 && currentScrollPosition < dataGridView.Rows.Count)
+            if (scrollPosition >= 0 && scrollPosition < dataGridView.Rows.Count)
             {
-                dataGridView.FirstDisplayedScrollingRowIndex = currentScrollPosition;
+                dataGridView.FirstDisplayedScrollingRowIndex = scrollPosition;
             }
         }
+
+        private void LoadProcesses()
+        {
+            int selectedRowIndex = dataGridView.SelectedRows.Count > 0 ? dataGridView.SelectedRows[0].Index : -1;
+            int currentScrollPosition = dataGridView.FirstDisplayedScrollingRowIndex;
+
+            UpdateProcessList();
+            RestoreSelection(selectedRowIndex, currentScrollPosition);
+        }
+
 
 
         private void btn_Start_Click(object sender, EventArgs e)
