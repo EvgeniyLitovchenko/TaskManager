@@ -111,38 +111,33 @@ namespace TaskManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Помилка доступу до процесу: {ex.Message}");
+                MessageBox.Show($"Помилка зупинки процесу: {ex.Message}");
                 return false;
             }
         }
+
 
         private void btn_delete_Click(object sender, EventArgs e)
         {
             if (TryGetSelectedProcess(out Process process))
             {
-                try
-                {
-                    process.Kill();
-                    MessageBox.Show($"Процес {process.ProcessName} було зупинено.");
-                    LoadProcesses();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Помилка зупинки процесу: {ex.Message}");
-                }
+                KillProcess(process);
             }
         }
+    }
 
-        private void btn_change_Click(object sender, EventArgs e)
+
+    private void btn_change_Click(object sender, EventArgs e)
+    {
+        if (TryGetSelectedProcess(out Process process))
         {
-            if (TryGetSelectedProcess(out Process process))
-            {
-                SetPriorityPanelVisibility(true);
-                panelPriority.Tag = process;
-            }
+            SetPriorityPanelVisibility(true);
+            panelPriority.Tag = process;
         }
+    }
 
-        private void btn_confirm_Click(object sender, EventArgs e)
+
+private void btn_confirm_Click(object sender, EventArgs e)
         {
             if (panelPriority.Tag is Process process)
             {
